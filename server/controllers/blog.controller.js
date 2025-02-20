@@ -182,10 +182,12 @@ export const getRecommendationsController = async (req, res) => {
 export const fetchExternalSourcesController = async (req, res) => {
   try {
     const data = await fetchExternalData();
-    res.json(data);
-
+    if (!data.length) {
+      return res.status(404).json({ message: "No articles found" });
+    }
+    res.json({ success: true, articles: data });
   } catch (error) {
     res.status(500).json({ message: "Server error" });
-    console.error(error.message);
+    console.error("Controller error:", error.message);
   }
-}
+};
