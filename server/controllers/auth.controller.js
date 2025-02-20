@@ -7,8 +7,8 @@ export const signupController = async (req, res) => {
   try {
     const { username, email, password } = SignupSchema.parse(req.body);
 
-    const existing_User = await User.findOne({ username });
-    if (existing_User) {
+    const userExists = await User.findOne({ username });
+    if (userExists) {
       return res
         .status(400)
         .json({ message: "User already exists with these credentials" });
@@ -41,7 +41,7 @@ export const loginController = async (req, res) => {
 
     const matches = await bcryptjs.compare(password, existing_User.password);
     if (!matches) {
-      return res.status(401).json({ message: "Creds don't match" });
+      return res.status(401).json({ message: "Invalid Password" });
     }
 
     const token = jwt.sign(
@@ -59,7 +59,8 @@ export const loginController = async (req, res) => {
 
 export const currentUserController = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select("-password");
+    const user = await User.findById(req.user.userId).select("-password");
+    console.log("user", user)
     if (!user) {
       return res.status(401).json({ message: "User not found" });
     }

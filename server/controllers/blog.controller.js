@@ -26,7 +26,6 @@ export const fetchBlogsController = async (req, res) => {
       if(cacheData) {
         return res.json(JSON.parse(cacheData));
       } 
-      else if(err) throw err;
 
     const query = search ? { title: new RegExp(search, 'i') } : {};
     const blogs = await Blog.find(query)
@@ -109,7 +108,7 @@ export const likeBlogController = async (req, res) => {
   try {
     const blog = await Blog.findById(req.params.id);
     if(!blog) {
-      return res.status(404).json({ message: "Blog not found" });
+      return res.status(403).json({ message: "Blog not found" });
     };
 
     if(blog.likes.includes(req.user.id)) {
@@ -119,7 +118,7 @@ export const likeBlogController = async (req, res) => {
     };
 
     await blog.save();
-    res.status(203).json({ message: "Blog like status updated", likes: blog.likes.length });
+    res.status(200).json({ message: "Blog like status updated", likes: blog.likes.length });
 
   } catch (error) {
     res.status(500).json({ message: "Server error" });
@@ -131,7 +130,7 @@ export const saveBlogController = async (req, res) => {
   try {
     const blog = await Blog.findById(req.params.id);
     if(!blog) {
-      return res.status(404).json({ message: "Blog not found" });
+      return res.status(403).json({ message: "Blog not found" });
     };
 
     if(blog.savedBy.includes(req.user.id)) {
@@ -141,7 +140,7 @@ export const saveBlogController = async (req, res) => {
     };
 
     await blog.save();
-    res.status(203).json({ message: "Blog save status updated" });
+    res.status(200).json({ message: "Blog save status updated" });
 
   } catch (error) {
     res.status(500).json({ message: "Server error" });
