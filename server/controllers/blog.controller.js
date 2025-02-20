@@ -22,10 +22,11 @@ export const fetchBlogsController = async (req, res) => {
     const { page = 1, limit = 5, search } = req.query;
     const cacheKey = `blogs-page-${page}-limit-${limit}-search-${search || 'all'}`;
 
-    redisClient.get(cacheKey, async (error, cacheData) => {
-      if(err) throw err;
-      if(cacheData) return res.json(JSON.parse(cacheData));
-    });
+    const cacheData = await redisClient.get(cacheKey)
+      if(cacheData) {
+        return res.json(JSON.parse(cacheData));
+      } 
+      else if(err) throw err;
 
     const query = search ? { title: new RegExp(search, 'i') } : {};
     const blogs = await Blog.find(query)
@@ -36,13 +37,15 @@ export const fetchBlogsController = async (req, res) => {
     const totalBlogs = await Blog.countDocuments(query);
     const response = { blogs, totalPages: Math.ceil(totalBlogs / limit) };
 
-    redisClient.setEx(cacheKey, 3600, JSON.stringify(response));
+    await redisClient.setEx(cacheKey, 3600, JSON.stringify(response));
     res.json(response);
   } catch (error) {
     res.status(500).json({ message: "Server error" });
     console.error(error.message);
   }
 };
+
+
 
 export const getBLogByIdController = async (req, res) => {
   try {

@@ -10,7 +10,10 @@ import blogRoutes from "./routes/blog.routes.js"
 dotenv.config();
 const server = express();
 
-const redisClient = createClient();
+const redisClient = createClient({
+    url: process.env.UPSTASH_REDIS_URL
+});
+
 redisClient.on('error', (err) => console.error(`Redis error: ${err}`));
 
 const cacheMiddleware = async (req, res, next) => {

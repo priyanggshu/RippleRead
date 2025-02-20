@@ -1,6 +1,6 @@
 import express from "express";
 import verified from "../middleware/verified.js";
-import { createBlogController, deleteBlogController, fetchBlogsController, fetchExternalSourcesController, getBLogByIdController, getRecommendationsController, likeBlogController, saveBlogController, updateBlogController } from "../controllers/blog.controller";
+import { createBlogController, deleteBlogController, fetchBlogsController, fetchExternalSourcesController, getBLogByIdController, getRecommendationsController, likeBlogController, saveBlogController, updateBlogController } from "../controllers/blog.controller.js";
 
 const router = express.Router();
 
