@@ -8,304 +8,410 @@ import { CgMenuMotion, CgSearch, CgSun, CgMoon } from "react-icons/cg";
 const Home = () => {
   const [dark, setDark] = useState(false);
   const { user } = useContext(AuthContext);
-  const { blogs } = useContext(BlogContext);
+  const { blogs = [] } = useContext(BlogContext);
   const [externalPosts, setExternalPosts] = useState([]);
+  const api_url = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     const fetchExternalPosts = async () => {
       try {
-        const response = await fetch("http://localhost:3000/blog/external");
+        const response = await fetch(`${api_url}/blog/external`);
         const data = await response.json();
-        setExternalPosts(Array.isArray(data.articles) ? data.articles : []);
-        console.log("Fetched data:", data);
+
+        if (data && Array.isArray(data.articles)) {
+          setExternalPosts(data.articles);
+        } else {
+          console.warn("Unexpected API response:", data);
+          setExternalPosts([]);
+        }
       } catch (error) {
         console.error("Error fetching external posts:", error);
+        setExternalPosts([]);
       }
     };
 
     fetchExternalPosts();
-  }, []);
+  }, [api_url]);
+
+  const formatDate = (dateString) => {
+    const options = {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    };
+    return new Date(dateString).toLocaleDateString("en-US", options);
+  };
+
+  const currentDate = formatDate(new Date());
 
   return (
     <div
       className={`min-h-screen flex flex-col ${
-        dark ? "bg-gray-900 text-white" : "bg-white text-black"
+        dark ? "bg-gray-900 text-gray-200" : "bg-[#E4E2D6] text-gray-900"
       }`}
     >
-      {/* Navbar */}
-      <nav className="bg-[#F6F4F6] shadow-md py-10 px-10 flex justify-between items-center h-12">
-        <div className="flex items-center gap-6 h-full">
-          <CgMenuMotion className="scale-125 cursor-pointer" />
-          <div className="flex items-center text-gray-600 hover:text-black text-sm gap-3 px-2 rounded-2xl h-full">
-            <CgSearch className="scale-125 cursor-pointer" />
-            <p>Search</p>
+      {/* Top utility bar */}
+      <div
+        className={`border-b ${
+          dark ? "border-gray-700" : "border-gray-200"
+        } py-2 px-6`}
+      >
+        <div className="flex justify-between items-center max-w-6xl mx-auto">
+          <div className="flex items-center gap-4">
+            <div
+              className="flex items-center text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white cursor-pointer"
+              onClick={() => setDark(!dark)}
+            >
+              {dark ? <CgMoon /> : <CgSun />}
+              <span className="ml-2 text-xs font-serif">
+                {dark ? "NIGHT" : "DAY"}
+              </span>
+            </div>
           </div>
-          <div
-            className="mode flex items-center text-gray-600 hover:text-black h-full cursor-pointer"
-            onClick={() => setDark(!dark)}
-          >
-            {dark ? <CgMoon /> : <CgSun />}
-            <span className="ml-2">{dark ? "Night" : "Day"}</span>
+
+          <div className="flex items-center gap-4">
+            <a
+              href="https://twitter.com"
+              target="_blank"
+              className="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white"
+            >
+              <FaTwitter />
+            </a>
+            <a
+              href="https://linkedin.com"
+              target="_blank"
+              className="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white"
+            >
+              <FaLinkedin />
+            </a>
+            <a
+              href="https://github.com"
+              target="_blank"
+              className="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white"
+            >
+              <FaGithub />
+            </a>
+            <Link
+              to="/login"
+              className="text-xs font-serif uppercase hover:underline"
+            >
+              Log in
+            </Link>
+            <Link
+              to="/signup"
+              className="text-xs font-serif uppercase hover:underline"
+            >
+              Subscribe
+            </Link>
           </div>
         </div>
-        <div className="bg-gradient-to-tr from-transparent via-yellow-400 to-transparent text-transparent 
-          bg-clip-text gap-1">
-          <h1 className="text-2xl font-semibold font-serif rounded-xl">
-            RippleRead
-          </h1>
+      </div>
+
+      {/* Main header with logo */}
+      <header
+        className={`border-b ${
+          dark ? "border-gray-700" : "border-gray-200"
+        } py-4`}
+      >
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="flex justify-between items-center">
+            <div className="w-1/3">
+              <p className="text-xs font-serif uppercase">{currentDate}</p>
+            </div>
+
+            <div className="w-1/3 text-center">
+              <h1 className="text-4xl font-serif font-bold italic tracking-tight">
+                RippleRead
+              </h1>
+            </div>
+
+            <div className="w-1/3 flex justify-end">
+              <div className="flex items-center border rounded">
+                <input
+                  type="text"
+                  placeholder="SEARCH"
+                  className={`text-sm px-2 py-1 w-32 focus:outline-none font-serif ${
+                    dark ? "bg-gray-800" : "bg-white"
+                  }`}
+                />
+                <button className="px-2">
+                  <CgSearch className="text-gray-600 dark:text-gray-400" />
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="flex items-center gap-5 h-full">
-          <a
-            href="https://twitter.com"
-            target="_blank"
-            className="hover:scale-110"
-          >
-            <FaTwitter />
-          </a>
-          <a
-            href="https://linkedin.com"
-            target="_blank"
-            className="hover:text-blue-600"
-          >
-            <FaLinkedin />
-          </a>
-          <a
-            href="https://github.com"
-            target="_blank"
-            className="hover:text-gray-700"
-          >
-            <FaGithub />
-          </a>
-          <Link
-            to="/signup"
-            className="bg-black text-white px-4 py-2 rounded-md"
-          >
-            Sign Up
-          </Link>
-          <Link to="/login" className="bg-white border px-4 py-2 rounded-md">
-            Login
-          </Link>
+      </header>
+
+      {/* Navigation menu */}
+      <nav
+        className={`border-b ${
+          dark ? "border-gray-700" : "border-gray-200"
+        } py-3`}
+      >
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="flex justify-between">
+            <CgMenuMotion className="cursor-pointer" />
+            <ul className="flex space-x-6 font-serif uppercase text-sm">
+              <li>
+                <Link to="/" className="hover:underline font-bold">
+                  Home
+                </Link>
+              </li>
+              <li>
+                <Link to="/world" className="hover:underline">
+                  World
+                </Link>
+              </li>
+              <li>
+                <Link to="/business" className="hover:underline">
+                  Business
+                </Link>
+              </li>
+              <li>
+                <Link to="/tech" className="hover:underline">
+                  Technology
+                </Link>
+              </li>
+              <li>
+                <Link to="/science" className="hover:underline">
+                  Science
+                </Link>
+              </li>
+              <li>
+                <Link to="/arts" className="hover:underline">
+                  Arts
+                </Link>
+              </li>
+              <li>
+                <Link to="/books" className="hover:underline">
+                  Books
+                </Link>
+              </li>
+              <li>
+                <Link to="/opinion" className="hover:underline">
+                  Opinion
+                </Link>
+              </li>
+            </ul>
+            <div></div> {/* Empty div for flex spacing */}
+          </div>
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <div className="py-4 flex justify-center space-x-8 bg-white text-gray-700 text-sm drop-shadow-sm">
-        <Link to="/blog/" className="hover:underline">
-          POST
-        </Link>
-        <Link to="/dashboard" className="hover:underline">
-          LIKED
-        </Link>
-        <Link to="/dashboard" className="hover:underline">
-          SAVED
-        </Link>
-        <Link to="/about" className="hover:underline">
-          ABOUT
-        </Link>
-        <Link to="/signup" className="hover:underline">
-          JOIN US
-        </Link>
-      </div>
-
-      {/* Main Content - External Posts */}
-      <div className="px-8 pt-12 bg-[F4F3F0]">
-        {externalPosts.length > 0 ? (
-          <div className="grid gap-6 ">
-            {/* First Post - Hero Style */}
-            {externalPosts[0] && (
-              <div className="w-full">
-                <h1 className="text-5xl font-serif text-center max-w-3xl mx-auto pb-8">
-                  {externalPosts[0].title.split(" ").slice(0, 10).join(" ")}...
-                </h1>
-                <div className="flex items-center justify-center gap-8">
-                  <div className="text-center font-serif text-sm text-gray-600 mt-2">
-                    by{" "}
-                    <span className="underline">
-                      {externalPosts[0].source_name}
-                    </span>{" "}
-                  </div>
-                  <div className="date font-serif text-gray-600 text-sm text-center mt-2">
-                    {new Date(
-                      externalPosts[0].published_datetime_utc
-                    ).toLocaleDateString()}
-                  </div>
-                </div>
-                <div className="mt-6">
-                  <img
-                    src={externalPosts[0].photo_url}
-                    alt="Post"
-                    className="w-full h-[600px] object-cover rounded-sm"
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* Next Three Posts - Stacked in a Column */}
-            <div className="grid md:grid-cols-3 gap-6">
-              {externalPosts.slice(1, 4).map((post, index) => (
-                <div
-                  key={post._id || index}
-                  className="shadow-md p-3 rounded-lg bg-[#F4F3F0]"
+      {/* Main content */}
+      <main className="max-w-6xl mx-auto px-6 py-8">
+        {/* Featured Article Section */}
+        {externalPosts.length > 0 && (
+          <div className="mb-12 border-b pb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div>
+                <h2 className="text-3xl md:text-4xl font-Quattrocento font-bold leading-tight mb-4">
+                  {externalPosts[0]?.title}
+                </h2>
+                <p className="text-lg font-serif leading-relaxed mb-4 text-gray-700 dark:text-gray-300">
+                  {externalPosts[0]?.description || "No description available"}
+                </p>
+                <p className="text-sm font-serif text-gray-500 dark:text-gray-400 mb-4">
+                  By{" "}
+                  {externalPosts[0]?.creator ||
+                    externalPosts[0]?.source_name ||
+                    "Unknown"}{" "}
+                  |
+                  {externalPosts[0]?.pubDate &&
+                    ` ${formatDate(externalPosts[0]?.pubDate)}`}
+                </p>
+                <a
+                  href={externalPosts[0]?.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-700 dark:text-blue-400 font-serif hover:underline"
                 >
-                  <img
-                    src={post.photo_url}
-                    alt="Post"
-                    className="w-2xl h-60 object-cover rounded-md"
-                  />
-                  <h3 className="text-lg font-semibold font-serif pb-2 mt-2">
-                    {post.title}
-                  </h3>
-                  <p className="text-gray-500 font-serif text-sm mt-1">
-                    {post.snippet}
-                  </p>
-                </div>
-              ))}
-            </div>
-
-            {/* Remaining Posts - Grid Format */}
-            <div className="flex flex-col md:flex-row gap-8">
-              {/* Posts Section (3/4 Width) */}
-              <div className="w-full md:w-3/4 bg-gray-200 border border-gray-300 rounded-xl space-y-8">
-                {externalPosts.slice(4).map((post, index) => (
-                  <div
-                    key={post._id || index}
-                    className="flex bg-transparent shadow-xs rounded-md overflow-hidden"
-                  >
-                    {/* Image Section */}
-                    <div className="w-2/3 mx-2 h-full">
-                      <img
-                        src={post.photo_url}
-                        alt="Post"
-                        className="p-4 rounded-3xl object-cover"
-                      />
-                    </div>
-
-                    {/* Content Section */}
-                    <div className="w-2/3 mr-2 p-6">
-                      <h3 className="text-2xl font-serif font-semibold">
-                        {post.title}
-                      </h3>
-                      <p className="text-gray-500 font-serif text-sm mt-4">
-                        {post.snippet}
-                      </p>
-                      <div className="text-sm text-gray-500 font-serif mt-5 flex items-center gap-3">
-                        <span className="font-semibold">
-                          {post.source_name}
-                        </span>{" "}
-                        •
-                        <span>
-                          {new Date(
-                            post.published_datetime_utc
-                          ).toLocaleDateString()}
-                        </span>
-                      </div>
-                      <a
-                        href={post.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-500 text-sm mt-3 font-serif block hover:underline"
-                      >
-                        Read More
-                      </a>
-                    </div>
-                  </div>
-                ))}
+                  Continue Reading
+                </a>
               </div>
-
-              {/* Sidebar Section (1/4 Width) */}
-              {/* Sidebar Section (1/4 Width) */}
-              <div className="w-full md:w-1/4 space-y-8">
-                {/* Categories Section */}
-                <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-200">
-                  <h3 className="text-2xl font-extrabold mb-6 text-gray-900 flex items-center gap-2">
-                    📌 Categories
-                  </h3>
-                  <ul className="space-y-4">
-                    {[
-                      { name: "Trending", icon: "🔥" },
-                      { name: "Culture", icon: "🎭" },
-                      { name: "Creativity", icon: "🎨" },
-                      { name: "Food", icon: "🍽️" },
-                      { name: "Travel", icon: "✈️" },
-                      { name: "Humor", icon: "😂" },
-                      { name: "Music", icon: "🎵" },
-                    ].map((category, index) => (
-                      <li key={index}>
-                        <Link
-                          to={`/search?category=${category.name.toLowerCase()}`}
-                          className="flex items-center gap-3 text-lg font-semibold text-gray-700 hover:text-blue-600 hover:bg-gray-100 px-3 py-2 rounded-lg transition-all duration-300"
-                        >
-                          <span className="text-2xl">{category.icon}</span>{" "}
-                          {category.name}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Search Bar */}
-                <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
-                  <h3 className="text-xl font-extrabold mb-4 text-gray-900 flex items-center gap-2">
-                    🔍 Search
-                  </h3>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      placeholder="Search posts..."
-                      className="w-full p-3 pl-10 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none"
-                    />
-                    <CgSearch className="absolute left-3 top-3 text-gray-400 text-lg" />
-                  </div>
-                </div>
-
-                {/* Newsletter */}
-                <div className="bg-blue-50 p-6 rounded-xl shadow-lg border border-blue-200">
-                  <h3 className="text-xl font-extrabold mb-4 text-gray-900 flex items-center gap-2">
-                    📬 Stay Updated
-                  </h3>
-                  <p className="text-sm text-gray-600 mb-4">
-                    Subscribe to receive the latest articles directly in your
-                    inbox!
-                  </p>
-                  <input
-                    type="email"
-                    placeholder="Enter your email"
-                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400 mb-4"
+              <div>
+                {externalPosts[0]?.image_url && (
+                  <img
+                    src={externalPosts[0]?.image_url}
+                    alt={externalPosts[0]?.title}
+                    className="w-full h-full object-cover"
                   />
-                  <button className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-all duration-300">
-                    Subscribe
-                  </button>
-                </div>
-
-                {/* Social Links */}
-                <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200 text-center">
-                  <h3 className="text-xl font-extrabold mb-4 text-gray-900 flex items-center justify-center gap-2">
-                    📲 Follow Us
-                  </h3>
-                  <div className="flex justify-center gap-5">
-                    <a
-                      href="https://twitter.com"
-                      target="_blank"
-                      className="text-gray-600 hover:text-blue-500 transition"
-                    >
-                      <FaTwitter size={24} />
-                    </a>
-                    <a
-                      href="https://linkedin.com"
-                      target="_blank"
-                      className="text-gray-600 hover:text-blue-500 transition"
-                    >
-                      <FaLinkedin size={24} />
-                    </a>
-                  </div>
-                </div>
+                )}
               </div>
             </div>
           </div>
-        ) : (
-          <p className="text-gray-500">No posts available.</p>
         )}
-      </div>
+
+        {/* Latest News Grid */}
+        <h2 className="text-2xl font-serif font-bold border-b pb-2 mb-6">
+          LATEST NEWS
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+          {externalPosts.slice(1, 7).map((post) => (
+            <article key={post.article_id || post.title} className="mb-6">
+              {post.image_url && (
+                <img
+                  src={post.image_url}
+                  alt={post.title}
+                  className="w-full h-48 object-cover mb-3"
+                />
+              )}
+              <h3 className="text-xl font-serif mb-2">
+                {post.title}
+              </h3>
+              <p className="text-sm font-serif text-gray-700 dark:text-gray-300 mb-2">
+                {post.description?.substring(0, 120) ||
+                  "No description available"}
+                {post.description?.length > 120 ? "..." : ""}
+              </p>
+              <div className="flex justify-between items-center">
+                <p className="text-xs font-serif text-gray-500 dark:text-gray-400">
+                  {post.source_name || "Unknown"}
+                </p>
+                <a
+                  href={post.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-700 dark:text-blue-400 text-sm font-serif hover:underline"
+                >
+                  Read More
+                </a>
+              </div>
+            </article>
+          ))}
+        </div>
+
+        {/* Blog Section */}
+        <h2 className="text-2xl font-serif font-bold border-b pb-2 mb-6">
+          FROM OUR BLOG
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {blogs.length > 0 ? (
+            blogs.map((blog) => (
+              <article key={blog._id} className="mb-6 pb-6 border-b">
+                <h3 className="text-xl font-serif font-semibold mb-2">
+                  {blog.title}
+                </h3>
+                <p className="text-sm font-serif text-gray-700 dark:text-gray-300 mb-3">
+                  {blog.summary}
+                </p>
+                <Link
+                  to={`/blog/${blog._id}`}
+                  className="text-blue-700 dark:text-blue-400 text-sm font-serif hover:underline"
+                >
+                  Continue Reading
+                </Link>
+              </article>
+            ))
+          ) : (
+            <p className="text-gray-600 dark:text-gray-400 font-serif italic">
+              No blogs available at the moment.
+            </p>
+          )}
+        </div>
+
+        {/* More News Section */}
+        <h2 className="text-2xl font-serif font-bold border-b pb-2 my-6">
+          MORE NEWS
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          {externalPosts.slice(7, 15).map((post) => (
+            <article key={post.article_id || post.title} className="mb-6">
+              <h3 className="text-md font-serif font-semibold mb-1">
+                {post.title}
+              </h3>
+              <p className="text-xs font-serif text-gray-500 dark:text-gray-400 mb-2">
+                {post.source_name || "Unknown"}
+              </p>
+              <a
+                href={post.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-700 dark:text-blue-400 text-xs font-serif hover:underline"
+              >
+                Read More
+              </a>
+            </article>
+          ))}
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer
+        className={`mt-auto border-t ${
+          dark ? "border-gray-700" : "border-gray-200"
+        } py-8`}
+      >
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+              <h3 className="text-lg font-serif font-bold mb-4">RippleRead</h3>
+              <p className="text-sm font-serif text-gray-600 dark:text-gray-400">
+                Your trusted source for the latest news and insights from around
+                the globe.
+              </p>
+            </div>
+            <div>
+              <h3 className="text-md font-serif font-bold mb-4">SECTIONS</h3>
+              <ul className="text-sm font-serif space-y-2 text-gray-600 dark:text-gray-400">
+                <li>
+                  <Link to="/" className="hover:underline">
+                    Home
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/world" className="hover:underline">
+                    World
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/business" className="hover:underline">
+                    Business
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/tech" className="hover:underline">
+                    Technology
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-md font-serif font-bold mb-4">FOLLOW US</h3>
+              <div className="flex space-x-4">
+                <a
+                  href="https://twitter.com"
+                  target="_blank"
+                  className="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white"
+                >
+                  <FaTwitter size={20} />
+                </a>
+                <a
+                  href="https://linkedin.com"
+                  target="_blank"
+                  className="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white"
+                >
+                  <FaLinkedin size={20} />
+                </a>
+                <a
+                  href="https://github.com"
+                  target="_blank"
+                  className="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white"
+                >
+                  <FaGithub size={20} />
+                </a>
+              </div>
+            </div>
+          </div>
+          <div className="border-t mt-8 pt-6 text-center">
+            <p className="text-xs font-serif text-gray-500 dark:text-gray-400">
+              © {new Date().getFullYear()} RippleRead. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
