@@ -1,7 +1,22 @@
-@import url('https://fonts.googleapis.com/css2?family=Krona+One&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Quattrocento:wght@400;700&family=Roboto:ital,wght@0,100..900;1,100..900&family=Syne:wght@400..800&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Krona+One&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Quattrocento:wght@400;700&family=Roboto:ital,wght@0,100..900;1,100..900&family=Source+Serif+Pro:wght@400;600;700&family=Syne:wght@400..800&display=swap');
 @import "tailwindcss";
+
+.font-Syne {
+    font-family: Syne;
+}
 
 .font-Quattrocento {
     font-family: Quattrocento;
+}
+
+.font-Montserrat {
+    font-family: Montserrat;
+}
+
+.font-Playfair {
+    font-family: Playfair Display;
+}
+
+.font-Source {
+    font-family: Source Serif Pro;
 }
