@@ -6,12 +6,15 @@
   "license": "MIT",
   "scripts": {
     "dev": "vite",
-    "build": "npx tailwindcss -o ./dist/tailwind.css --minify && vite build",
+    "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "postinstall": "npx tailwindcss -o ./dist/tailwind.css --minify"
   },
   "dependencies": {
     "@tailwindcss/vite": "4.0.7",
+    "tailwindcss": "^4.0.17",
+    "@tailwindcss/oxide": "^4.0.17",
     "axios": "^1.7.9",
     "esbuild": "^0.25.0",
     "framer-motion": "^12.6.2",
@@ -32,7 +35,6 @@
     "eslint-plugin-react-refresh": "^0.4.18",
     "globals": "^15.14.0",
     "rollup": "^4.38.0",
-    "tailwindcss": "^4.0.17",
     "vite": "^6.2.4"
   },
   "resolutions": {
